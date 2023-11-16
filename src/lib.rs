@@ -1,14 +1,20 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+//! # Hash Consing Library
+//!
+//! This library provides implementations for hash consing in both
+//! single-threaded and multi-threaded environments.
+//!
+//! ## Features
+//! - `single-threaded`: For single-threaded environments.
+//! - `thread-safe`: For thread-safe environments.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[cfg(feature = "single-threaded")]
+pub mod single_threaded;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+#[cfg(feature = "thread-safe")]
+pub mod thread_safe;
+
+#[cfg(feature = "single-threaded")]
+pub use single_threaded::*;
+
+#[cfg(feature = "thread-safe")]
+pub use thread_safe::*;

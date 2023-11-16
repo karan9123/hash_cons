@@ -1,0 +1,73 @@
+= Hash Consing Library
+:name: hash_cons
+:toc:
+:toc-placement: preamble
+
+Hash Consing Library (`hash_cons`) is a Rust library offering efficient hash consing mechanisms suitable for both single-threaded and multi-threaded environments. This library provides a way to reuse immutable data structures efficiently, reducing memory usage and improving performance in applications where duplicate data structures are common.
+
+== Features
+* *Single-Threaded*: Ideal for applications that do not require thread safety. It uses `Rc` and `RefCell` for efficient memory management without the overhead of synchronization.
+* *Thread-Safe*: Suitable for multi-threaded applications, using `Arc` and `RwLock` to ensure safe concurrent access.
+
+== Usage
+Add `hash_cons` as a dependency in your project's `Cargo.toml`:
+
+[source,toml]
+----
+[dependencies]
+hash_cons = "0.1.0"  # Replace with the actual version
+----
+
+Select the appropriate feature for your application:
+
+[source,toml]
+----
+# For single-threaded environments
+hash_cons = { version = "0.1.0", features = ["single-threaded"] }
+
+# For multi-threaded environments
+hash_cons = { version = "0.1.0", features = ["thread-safe"] }
+----
+
+== Examples
+=== Single-Threaded Usage
+In a single-threaded context, the library can be used as follows:
+
+[source,rust]
+----
+use hash_cons::single_threaded::HCTable;
+
+fn main() {
+    let mut table = HCTable::new();
+    let hc_value = table.insert(42);
+    // Use hc_value as needed
+}
+----
+
+=== Thread-Safe Usage
+For multi-threaded scenarios, the thread-safe version of the library can be implemented like this:
+
+[source,rust]
+----
+use hash_cons::thread_safe::AhcTable;
+
+fn main() {
+    let table = AhcTable::new();
+    let hc_value = table.insert(42);
+    // Share and use hc_value across threads
+}
+----
+
+== Testing
+Run the tests to ensure everything is working as expected:
+
+[source,shell]
+----
+cargo test
+----
+
+== Contributing
+Contributions are welcome. Please adhere to the project's coding standards and include tests for new features or bug fixes.
+
+== License
+This project is licensed under the MIT License. See the `LICENSE` file in the repository for more information.
