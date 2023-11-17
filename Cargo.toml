@@ -3,7 +3,9 @@ name = "hash_cons"
 authors = ["Karan Ahluwalia"]
 version = "0.1.0"
 edition = "2021"
+descirption = "A type-safe hash consing library for rust"
 readme = "readme.adoc"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
