@@ -17,8 +17,8 @@ use std::rc::{Rc, Weak};
 /// ## Example
 /// ```
 /// use hash_cons::single_threaded::Hc;
-/// use hash_cons::single_threaded::HCTable;
-/// let table = HCTable::new();
+/// use hash_cons::single_threaded::HcTable;
+/// let table = HcTable::new();
 /// let hc_pointer = table.hashcons(42);
 /// assert_eq!(*hc_pointer.get(), 42);
 /// ```
@@ -40,8 +40,8 @@ where
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let my_value = table.hashcons(10);
     /// assert_eq!(*my_value.get(), 10);
     /// ```
@@ -64,8 +64,8 @@ where
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(5);
     /// let value3 = table.hashcons(10);
@@ -91,10 +91,10 @@ where
     /// * `state`: The `Hasher` instance to use for hashing.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
+    /// use hash_cons::single_threaded::HcTable;
     /// use std::collections::hash_map::DefaultHasher;
     /// use std::hash::{Hash, Hasher};
-    /// let table = HCTable::new();
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// let mut hasher = DefaultHasher::new();
     /// value.hash(&mut hasher);
@@ -114,8 +114,8 @@ where
     /// A new `Hc<T>` instance with the same value as the original.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// let value_clone = value.clone();
     /// assert_eq!(value, value_clone);
@@ -145,8 +145,8 @@ where
     /// * `f`: The `Formatter` instance to use for printing.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// println!("{:?}", value);
     /// ```
@@ -166,8 +166,8 @@ where
     /// * `f`: The `Formatter` instance to use for printing.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// println!("{}", value);
     /// ```
@@ -189,8 +189,8 @@ where
     /// A reference to the underlying value.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// assert_eq!(*value, 5);
     /// ```
@@ -217,8 +217,8 @@ where
     /// A reference to the underlying value.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// assert_eq!(value.as_ref(), &5);
     /// ```
@@ -247,8 +247,8 @@ where
     /// `Some(std::cmp::Ordering)` if the two instances are comparable, `None` otherwise.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
     /// assert!(value1 < value2);
@@ -275,8 +275,8 @@ where
     /// `std::cmp::Ordering` if the two instances are comparable.
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HCTable;
-    /// let table = HCTable::new();
+    /// use hash_cons::single_threaded::HcTable;
+    /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
     /// assert!(value1 < value2);
@@ -304,14 +304,14 @@ where
 /// ## Fields
 /// * `table`: HashMap - The underlying data structure storing `Hc<T>` instances.
 ///
-pub struct HCTable<T>
+pub struct HcTable<T>
 where
     T: Hash + Eq,
 {
     inner: Rc<InnerTable<T>>,
 }
 
-impl<T> HCTable<T>
+impl<T> HcTable<T>
 where
     T: Hash + Eq,
 {
@@ -320,7 +320,7 @@ where
     /// ## Returns
     /// A new instance of `HCTable<T>`.
     pub fn new() -> Self {
-        HCTable {
+        HcTable {
             inner: Rc::new(InnerTable::new()),
         }
     }

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::sync::{Arc, RwLock, Weak};
 
-/// # AAhc<T>
+/// # Ahc<T>
 /// A thread-safe custom smart pointer type for managing the lifecycle of consed values.
 ///
 /// ## Type Parameters
@@ -15,8 +15,8 @@ use std::sync::{Arc, RwLock, Weak};
 ///
 /// ## Example
 /// ```
-/// use hash_cons::thread_safe::Ahc;
-/// use hash_cons::thread_safe::AhcTable;
+/// use hash_cons::Ahc;
+/// use hash_cons::AhcTable;
 /// let table = AhcTable::new();
 /// let ahc_pointer = table.hashcons(42);
 /// assert_eq!(*ahc_pointer.get(), 42);
@@ -34,14 +34,14 @@ impl<T> Ahc<T>
 where
     T: Hash + Eq,
 {
-    /// Retrieves a reference to the value stored in this `AAhc<T>`.
+    /// Retrieves a reference to the value stored in this `Ahc<T>`.
     ///
     /// ## Returns
     /// A reference to the stored value.
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let my_value = table.hashcons(10);
     /// assert_eq!(*my_value.get(), 10);
@@ -66,7 +66,7 @@ where
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(5);
@@ -91,11 +91,13 @@ where
     /// `Ahc<T>` instances.
     /// ## Parameters
     /// * `state`: The `Hasher` instance to use for hashing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// use std::collections::hash_map::DefaultHasher;
     /// use std::hash::{Hash, Hasher};
+    ///
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// let mut hasher = DefaultHasher::new();
@@ -114,14 +116,16 @@ where
     /// Provides the functionality to clone `Ahc<T>` instances.
     /// ## Returns
     /// A new `Ahc<T>` instance with the same value as the original.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// let value_clone = value.clone();
     /// assert_eq!(value, value_clone);
     /// ```
+    ///
     /// ## Note
     /// This method is implemented using `Arc::clone()`.
     /// This method does not actually clone the underlying value. Instead, it
@@ -145,9 +149,10 @@ where
     /// This method is useful for debugging.
     /// ## Parameters
     /// * `f`: The `Formatter` instance to use for printing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// println!("{:?}", value);
@@ -166,9 +171,10 @@ where
     /// This method is useful for debugging.
     /// ## Parameters
     /// * `f`: The `Formatter` instance to use for printing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// println!("{}", value);
@@ -189,13 +195,15 @@ where
     /// This method is useful for accessing the underlying value.
     /// ## Returns
     /// A reference to the underlying value.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// assert_eq!(*value, 5);
     /// ```
+    ///
     /// ## Note
     /// This method is implemented using `Arc::deref()`.
     /// This method does not actually dereference the underlying value. Instead, it
@@ -218,13 +226,15 @@ where
     /// This method is useful for accessing the underlying value.
     /// ## Returns
     /// A reference to the underlying value.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value = table.hashcons(5);
     /// assert_eq!(value.as_ref(), &5);
     /// ```
+    ///
     /// ## Note
     /// This method is implemented using `Arc::as_ref()`.
     /// This method does not actually convert the underlying value to a reference. Instead, it
@@ -248,14 +258,16 @@ where
     /// * `other`: Another `Ahc<T>` instance to compare with.
     /// ## Returns
     /// `Some(std::cmp::Ordering)` if the two instances are comparable, `None` otherwise.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
     /// assert!(value1 < value2);
     /// ```
+    ///
     /// ## Note
     /// This method is implemented using `Arc::partial_cmp()`.
     /// This method does not actually compare the underlying values. Instead, it
@@ -276,14 +288,16 @@ where
     /// * `other`: Another `Ahc<T>` instance to compare with.
     /// ## Returns
     /// `std::cmp::Ordering` if the two instances are comparable.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::thread_safe::AhcTable;
+    /// use hash_cons::AhcTable;
     /// let table = AhcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
     /// assert!(value1 < value2);
     /// ```
+    ///
     /// ## Note
     /// This method is implemented using `Arc::cmp()`.
     /// This method does not actually compare the underlying values. Instead, it
@@ -323,6 +337,13 @@ where
     ///
     /// ## Returns
     /// A new instance of `AhcTable<T>`.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// ```
     pub fn new() -> Self {
         AhcTable {
             inner: Arc::new(InnerTable::new()),
@@ -336,6 +357,15 @@ where
     ///
     /// ## Returns
     /// A `Ahc<T>` instance corresponding to the given value.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// let value = table.hashcons(5);
+    /// ```
+    ///
     pub fn hashcons(&self, value: T) -> Ahc<T> {
         Ahc {
             inner: self.intern(value),
@@ -351,6 +381,7 @@ where
     ///
     /// ## Returns
     /// A `Arc<Inner<T>>` pointer to the stored value.
+    ///
     ///
     fn intern(&self, value: T) -> Arc<Inner<T>> {
         let arc_table = self.inner.clone();
@@ -399,6 +430,16 @@ where
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
     ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// let value = table.hashcons(5);
+    /// drop(value);
+    /// table.cleanup();
+    /// ```
+    ///
     pub fn cleanup(&self) {
         self.inner.cleanup();
     }
@@ -407,6 +448,15 @@ where
     ///
     /// ## Returns
     /// The number of elements in the `AhcTable`.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// let value = table.hashcons(5);
+    /// assert_eq!(table.len(), 1);
+    /// ```
     ///
     pub fn len(&self) -> usize {
         self.inner.len()
@@ -417,6 +467,20 @@ impl<T> Clone for AhcTable<T>
 where
     T: Hash + Eq,
 {
+    /// Provides the functionality to clone `AhcTable<T>` instances.
+    /// ## Returns
+    /// A new `AhcTable<T>` instance with the same values as the original.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// let value = table.hashcons(5);
+    /// let table_clone = table.clone();
+    /// assert_eq!(table.len(), table_clone.len());
+    /// ```
+    ///
     fn clone(&self) -> Self {
         AhcTable {
             inner: self.inner.clone(),
@@ -452,6 +516,18 @@ where
     /// This method is useful for managing the lifecycle of `Ahc<T>` instances.
     /// ## Note
     /// This method is implemented using `Weak::upgrade()`.
+    /// It removes the entry from the table if the table still exists.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::AhcTable;
+    ///
+    /// let table = AhcTable::new();
+    /// let value = table.hashcons(5);
+    /// drop(value);
+    /// table.cleanup();
+    /// ```
+    ///
     fn drop(&mut self) {
         let weak_table = self._table.clone();
         match weak_table.upgrade() {

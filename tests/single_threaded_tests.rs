@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod single_threaded_tests {
-    use hash_cons::{HCTable, Hc};
+    use hash_cons::{Hc, HcTable};
     use rand::Rng;
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -18,7 +18,7 @@ mod single_threaded_tests {
     // Test case for basic hashconsing of a simple constant value.
     #[test]
     fn test_basic_const_hashconsing() {
-        let table: HCTable<BoolExpr> = HCTable::new();
+        let table: HcTable<BoolExpr> = HcTable::new();
         let expr_true = BoolExpr::Const(true);
         let expr_true_v2 = BoolExpr::Const(true);
         let hc_true: Hc<BoolExpr> = table.hashcons(expr_true);
@@ -38,7 +38,7 @@ mod single_threaded_tests {
     // Test case for hashconsing complex boolean expressions.
     #[test]
     fn test_complex_expression_hashconsing() {
-        let table = HCTable::new();
+        let table = HcTable::new();
         let expr_true = BoolExpr::Const(true);
         let expr_false = BoolExpr::Const(false);
         let hc_true = table.hashcons(expr_true);
@@ -57,7 +57,7 @@ mod single_threaded_tests {
     // Tests the effectiveness of the cleanup method in HCTable.
     #[test]
     fn test_cleanup_effectiveness() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
 
         // hash cons several values
         let hc_true = table.hashcons(BoolExpr::Const(true));
@@ -93,7 +93,7 @@ mod single_threaded_tests {
     // Tests the drop behavior of HCTable
     #[test]
     fn test_drop_behavior() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
 
         // Intern a value and keep a reference to it
         let interned_expr = table.hashcons(BoolExpr::Const(true));
@@ -143,7 +143,7 @@ mod single_threaded_tests {
             }
         }
 
-        let table = HCTable::<BoolExprHC>::new();
+        let table = HcTable::<BoolExprHC>::new();
         let expr_true = BoolExprHC::Const(true);
         let expr_not_false = BoolExprHC::Not(table.hashcons(BoolExprHC::Const(false)));
         let hc_true = table.hashcons(expr_true);
@@ -168,7 +168,7 @@ mod single_threaded_tests {
     // Tests memory usage efficiency in hash consing.
     #[test]
     fn test_memory_usage_hash_consing() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
         let mut hc_data = Vec::new();
         let mut data = Vec::new();
 
@@ -196,7 +196,7 @@ mod single_threaded_tests {
 
     #[test]
     fn stress_test_hc_table() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
         let mut hc_data = Vec::new();
         let true_bool_expr = BoolExpr::Const(true);
         let false_bool_expr = BoolExpr::Const(false);
@@ -245,7 +245,7 @@ mod single_threaded_tests {
 
     #[test]
     fn test_reentrant_drop() {
-        let table = HCTable::<PanicOnDrop>::new();
+        let table = HcTable::<PanicOnDrop>::new();
 
         // Intern the PanicOnDrop
         let hc = table.hashcons(PanicOnDrop);
@@ -262,7 +262,7 @@ mod single_threaded_tests {
     // Tests hashconsing with a large set of unique boolean expressions.
     #[test]
     fn test_large_unique() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
         let mut hc_data = Vec::new();
 
         let true_bool_expr = BoolExpr::Const(true);
@@ -288,7 +288,7 @@ mod single_threaded_tests {
     // Tests hashconsing with a large set of non-unique boolean expressions.
     #[test]
     fn test_large_non_unique() {
-        let table = HCTable::<BoolExpr>::new();
+        let table = HcTable::<BoolExpr>::new();
         let mut hc_data = Vec::new();
 
         let true_bool_expr = BoolExpr::Const(true);
