@@ -86,4 +86,4 @@ We welcome contributions and suggestions to make `hash_cons` better. If you have
 
 ## License
 
-Licensed under the MIT License. See the [LICENSE](https://github.com/karan9123/hash_cons/LICENSE) file for more details.
+Licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
