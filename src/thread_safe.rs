@@ -342,7 +342,7 @@ where
     /// ```
     /// use hash_cons::AhcTable;
     ///
-    /// let table = AhcTable::new();
+    /// let table: AhcTable<i32> = AhcTable::new();
     /// ```
     pub fn new() -> Self {
         AhcTable {
