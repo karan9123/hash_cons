@@ -66,8 +66,5 @@ Run the tests to ensure everything is working as expected:
 cargo test
 ----
 
-== Contributing
-Contributions are welcome. Please adhere to the project's coding standards and include tests for new features or bug fixes.
-
 == License
 This project is licensed under the MIT License. See the `LICENSE` file in the repository for more information.
