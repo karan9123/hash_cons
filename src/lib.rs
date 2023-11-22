@@ -13,7 +13,7 @@
 //!
 //! ## Features
 //!
-//! * **Single-Threaded (Default Feature)**: Tailored for applications not requiring thread safety, this default mode uses `Rc` and `RefCell` for efficient memory management, avoiding the overhead of synchronization mechanisms.
+//! * **auto-cleanup (Default Feature)**: Tailored for applications not requiring thread safety, this default mode uses `Rc` and `RefCell` for efficient memory management, avoiding the overhead of synchronization mechanisms.
 //! * **Thread-Safe**: Designed for multi-threaded applications, it uses `Arc` and `RwLock` to guarantee safe concurrent access, aligning with Rust's emphasis on safety.
 //!
 //! ## Usage
@@ -28,7 +28,7 @@
 //! By default, the library operates in a single-threaded environment. For multi-threaded support, enable the `thread-safe` feature:
 //!
 //! ```toml
-//! # Default single-threaded
+//! # Default
 //! hash_cons = "0.1.1"
 //!
 //! # For multi-threaded environments
@@ -37,11 +37,12 @@
 //!
 //! ## Examples
 //!
-//! ### Single-Threaded Usage
-//!
 //! ```rust
+//! // Single-threaded example
+//! #[cfg(not(feature = "thread-safe"))]
 //! use hash_cons::{HcTable, Hc};
 //!
+//!  #[cfg(not(feature = "thread-safe"))]
 //!  #[derive(Hash, PartialEq, Eq)]
 //!    enum BoolExpr {
 //!         Const(bool),
@@ -49,19 +50,21 @@
 //!         Or(Hc<BoolExpr>, Hc<BoolExpr>),
 //!         Not(Hc<BoolExpr>),
 //!     }
+//! #[cfg(not(feature = "thread-safe"))]
 //! fn main() {
+//!  
 //!     let table: HcTable<BoolExpr> = HcTable::new();
 //!     let const_true = BoolExpr::Const(true);
 //!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true); // hc_true is automatically dropped when no longer used
 //! }
-//! ```
 //!
-//! ### Thread-Safe Usage
 //!
-//! ```rust
+//! // Thread-safe example
+//! #[cfg(feature = "thread-safe")]
 //! use hash_cons::{AhcTable, Ahc};
 //! use std::thread;
 //!
+//! #[cfg(feature = "thread-safe")]
 //! #[derive(Hash, PartialEq, Eq)]
 //! enum BoolExpr {
 //!     Const(bool),
@@ -69,6 +72,8 @@
 //!     Or(Ahc<BoolExpr>, Ahc<BoolExpr>),
 //!     Not(Ahc<BoolExpr>),
 //! }
+//!
+//! #[cfg(feature = "thread-safe")]
 //! fn main() {
 //! let table: AhcTable<BoolExpr> = AhcTable::new();
 //!     let thread_handle_ahc_false = thread::spawn(move || {
@@ -79,10 +84,10 @@
 //! ```
 //!
 
-#[cfg(feature = "single-threaded")]
+#[cfg(not(feature = "thread-safe"))]
 pub mod single_threaded;
 
-#[cfg(feature = "single-threaded")]
+#[cfg(not(feature = "thread-safe"))]
 pub use single_threaded::*;
 
 #[cfg(feature = "thread-safe")]

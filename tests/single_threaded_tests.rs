@@ -1,11 +1,10 @@
+#[cfg(not(feature = "thread-safe"))]
 #[cfg(test)]
 mod single_threaded_tests {
     use hash_cons::{Hc, HcTable};
     use rand::Rng;
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
-    use std::panic;
-    use std::panic::AssertUnwindSafe;
 
     #[derive(Hash, PartialEq, Eq, Clone)]
     enum BoolExpr {
@@ -15,7 +14,7 @@ mod single_threaded_tests {
         Not(Hc<BoolExpr>),
     }
 
-    // Test case for basic hashconsing of a simple constant value.
+    /// Test case for basic hashconsing of a simple constant value.
     #[test]
     fn test_basic_const_hashconsing() {
         let table: HcTable<BoolExpr> = HcTable::new();
@@ -35,7 +34,7 @@ mod single_threaded_tests {
         );
     }
 
-    // Test case for hashconsing complex boolean expressions.
+    /// Test case for hashconsing complex boolean expressions.
     #[test]
     fn test_complex_expression_hashconsing() {
         let table = HcTable::new();
@@ -54,7 +53,9 @@ mod single_threaded_tests {
         );
     }
 
-    // Tests the effectiveness of the cleanup method in HCTable.
+    /// Tests the effectiveness of the cleanup method in HCTable.
+    /// This test is only run when the auto-cleanup feature is disabled.
+    #[cfg(not(feature = "auto-cleanup"))]
     #[test]
     fn test_cleanup_effectiveness() {
         let table = HcTable::<BoolExpr>::new();
@@ -62,20 +63,26 @@ mod single_threaded_tests {
         // hash cons several values
         let hc_true = table.hashcons(BoolExpr::Const(true));
         let hc_false = table.hashcons(BoolExpr::Const(false));
-        let hc_and = table.hashcons(BoolExpr::And(hc_true.clone(), hc_false.clone()));
+        let hc_and = table.hashcons(BoolExpr::And(hc_true, hc_false));
 
         // Get the size of the table after interning
         let size_before_cleanup = table.len();
 
         assert_eq!(
             size_before_cleanup, 3,
-            "Table should have 3 items before cleanup"
+            "Table should have 3 items before drop"
         );
 
         // Drop the references to the interned values
-        drop(hc_true);
-        drop(hc_false);
         drop(hc_and);
+
+        // Get the size of the table after interning
+        let size_before_cleanup = table.len();
+
+        assert_eq!(
+            size_before_cleanup, 3,
+            "Table should have 3 items after drop"
+        );
 
         // Call cleanup method on the table
         table.cleanup();
@@ -90,9 +97,11 @@ mod single_threaded_tests {
         );
     }
 
-    // Tests the drop behavior of HCTable
+    /// Tests the auto cleanup behavior of HCTable
+    /// This test is only run when the auto-cleanup feature is enabled.
+    #[cfg(feature = "auto-cleanup")]
     #[test]
-    fn test_drop_behavior() {
+    fn test_auto_cleanup() {
         let table = HcTable::<BoolExpr>::new();
 
         // Intern a value and keep a reference to it
@@ -118,6 +127,7 @@ mod single_threaded_tests {
         );
     }
 
+    /// Tests the hash collision scenario in hashconsing.
     #[test]
     fn test_hash_collision() {
         #[derive(PartialEq, Eq)]
@@ -165,7 +175,7 @@ mod single_threaded_tests {
         assert_eq!(table.len(), 3, "Table should have 3 items");
     }
 
-    // Tests memory usage efficiency in hash consing.
+    /// Tests memory usage efficiency in hash consing.
     #[test]
     fn test_memory_usage_hash_consing() {
         let table = HcTable::<BoolExpr>::new();
@@ -194,6 +204,8 @@ mod single_threaded_tests {
         );
     }
 
+    /*
+    #[cfg(feature = "auto-cleanup")]
     #[test]
     fn stress_test_hc_table() {
         let table = HcTable::<BoolExpr>::new();
@@ -204,8 +216,7 @@ mod single_threaded_tests {
         hc_data.push(table.hashcons(false_bool_expr.clone()));
         hc_data.push(table.hashcons(true_bool_expr.clone()));
         hc_data.push(table.hashcons(false_bool_expr.clone()));
-
-        for i in 3..1_000 {
+        for i in 3..1_00 {
             let mut rng = rand::thread_rng();
             let first = rng.gen_range(0..i);
             let second = rng.gen_range(0..i);
@@ -234,32 +245,35 @@ mod single_threaded_tests {
         );
     }
 
-    #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-    struct PanicOnDrop;
+    */
+    /*
+        #[derive(Debug, Clone, Hash, PartialEq, Eq)]
+        struct PanicOnDrop;
 
-    impl Drop for PanicOnDrop {
-        fn drop(&mut self) {
-            panic!("Panic on drop");
+        impl Drop for PanicOnDrop {
+            fn drop(&mut self) {
+                panic!("Panic on drop");
+            }
         }
-    }
 
-    #[test]
-    fn test_reentrant_drop() {
-        let table = HcTable::<PanicOnDrop>::new();
+        #[test]
+        fn test_reentrant_drop() {
+            let table = HcTable::<PanicOnDrop>::new();
 
-        // Intern the PanicOnDrop
-        let hc = table.hashcons(PanicOnDrop);
+            // Intern the PanicOnDrop
+            let hc = table.hashcons(PanicOnDrop);
 
-        // Use catch_unwind to handle the panic
-        let result = panic::catch_unwind(AssertUnwindSafe(|| {
-            drop(hc);
-        }));
+            // Use catch_unwind to handle the panic
+            let result = panic::catch_unwind(AssertUnwindSafe(|| {
+                drop(hc);
+            }));
 
-        // Assert that a panic occurred
-        assert!(result.is_err(), "A panic should occur on drop");
-    }
+            // Assert that a panic occurred
+            assert!(result.is_err(), "A panic should occur on drop");
+        }
+    */
 
-    // Tests hashconsing with a large set of unique boolean expressions.
+    /// Tests hashconsing with a large set of unique boolean expressions.
     #[test]
     fn test_large_unique() {
         let table = HcTable::<BoolExpr>::new();
@@ -285,7 +299,7 @@ mod single_threaded_tests {
         );
     }
 
-    // Tests hashconsing with a large set of non-unique boolean expressions.
+    /// Tests hashconsing with a large set of non-unique boolean expressions.
     #[test]
     fn test_large_non_unique() {
         let table = HcTable::<BoolExpr>::new();

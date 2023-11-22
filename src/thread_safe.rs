@@ -426,6 +426,7 @@ where
         }
     }
 
+    #[cfg(not(feature = "auto-cleanup"))]
     /// Cleans up the `AhcTable`, removing any values that are no longer in use.
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
@@ -508,6 +509,7 @@ where
     _table: Weak<InnerTable<T>>,
 }
 
+#[cfg(feature = "auto-cleanup")]
 impl<T> Drop for Inner<T>
 where
     T: Hash + Eq,
@@ -600,6 +602,7 @@ where
         table.len()
     }
 
+    #[cfg(not(feature = "auto-cleanup"))]
     /// Cleans up the `InnerTable`, removing any values that are no longer in use.
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
@@ -608,7 +611,39 @@ where
     /// It removes any values that have a `strong_count()` of 0.
     /// This is the desired behavior for hash consing.
     ///
+    ///
     fn cleanup(&self) {
+        loop {
+            let mut_table_result = self.table.write();
+
+            let mut mut_table = match mut_table_result {
+                Ok(guard) => guard,
+                Err(poisoned) => {
+                    eprintln!("Mutex is poisoned. Continuing with the poisoned lock.");
+                    poisoned.into_inner() // continues, because we are removing the value
+                }
+            };
+
+            // Flag to check if any weak references are dropped in this iteration
+            let mut dropped = false;
+
+            mut_table.retain(|_, weak_ahc: &mut Weak<Inner<T>>| {
+                if weak_ahc.strong_count() == 0 {
+                    dropped = true; // A weak reference was dropped
+                    false // Remove this entry
+                } else {
+                    true // Keep this entry
+                }
+            });
+
+            // Break the loop if no weak references were dropped in this iteration
+            if !dropped {
+                break;
+            }
+        }
+    }
+
+    /*fn cleanup(&self) {
         let mut_table_result = self.table.write();
 
         let mut mut_table = match mut_table_result {
@@ -620,5 +655,5 @@ where
         };
 
         mut_table.retain(|_, weak_ahc: &mut Weak<Inner<T>>| weak_ahc.strong_count() > 0);
-    }
+    }*/
 }

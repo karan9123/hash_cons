@@ -15,9 +15,9 @@ categories = ["data-structures", "interning", "memoization", "caching", "asynchr
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
-default = ["single-threaded"]
-single-threaded = []
+default = ["auto-cleanup"]
 thread-safe = []
+auto-cleanup = []
 
 [dev-dependencies]
 rand = "0.8.5"

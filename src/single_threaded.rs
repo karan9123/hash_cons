@@ -1,4 +1,4 @@
-#[cfg(feature = "single-threaded")]
+#[cfg(not(feature = "thread_safe"))]
 use std::cell::RefCell;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
@@ -382,6 +382,7 @@ where
         }
     }
 
+    #[cfg(not(feature = "auto-cleanup"))]
     /// Cleans up the `HCTable`, removing any values that are no longer in use.
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
@@ -424,6 +425,7 @@ where
     _table: Weak<InnerTable<T>>,
 }
 
+#[cfg(feature = "auto-cleanup")]
 impl<T> Drop for Inner<T>
 where
     T: Hash + Eq,
@@ -491,6 +493,7 @@ where
         self.table.borrow().len()
     }
 
+    #[cfg(not(feature = "auto-cleanup"))]
     /// Cleans up the `InnerTable`, removing any values that are no longer in use.
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
@@ -500,7 +503,19 @@ where
     /// This is the desired behavior for hash consing.
     ///
     fn cleanup(&self) {
+        loop {
+            let mut mut_table = self.table.borrow_mut();
+            let prev_len = mut_table.len();
+            mut_table.retain(|_, weak_hc: &mut Weak<Inner<T>>| weak_hc.strong_count() > 0);
+
+            // Break the loop if no more values were removed.
+            if mut_table.len() == prev_len {
+                break;
+            }
+        }
+    }
+    /*fn cleanup(&self) {
         let mut mut_table = self.table.borrow_mut();
         mut_table.retain(|_, weak_hc: &mut Weak<Inner<T>>| weak_hc.strong_count() > 0);
-    }
+    }*/
 }

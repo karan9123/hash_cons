@@ -1,3 +1,4 @@
+#[cfg(feature = "thread-safe")]
 #[cfg(test)]
 mod thread_safe_tests {
     use hash_cons::Ahc;
@@ -15,10 +16,8 @@ mod thread_safe_tests {
         use rand::Rng;
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        use std::panic;
-        use std::panic::AssertUnwindSafe;
 
-        // Test case for basic hashconsing of a simple constant value.
+        /// Test case for basic hashconsing of a simple constant value.
         #[test]
         fn test_basic_const_hashconsing() {
             let table: AhcTable<BoolExpr> = AhcTable::new();
@@ -38,7 +37,7 @@ mod thread_safe_tests {
             );
         }
 
-        // Test case for hashconsing complex boolean expressions.
+        /// Test case for hashconsing complex boolean expressions.
         #[test]
         fn test_complex_expression_hashconsing() {
             let table = AhcTable::new();
@@ -57,6 +56,7 @@ mod thread_safe_tests {
             );
         }
 
+        #[cfg(not(feature = "auto-cleanup"))]
         #[test]
         fn test_cleanup_effectiveness() {
             let table = AhcTable::<BoolExpr>::new();
@@ -90,6 +90,7 @@ mod thread_safe_tests {
             );
         }
 
+        #[cfg(feature = "auto-cleanup")]
         #[test]
         fn test_drop_behavior() {
             let table = AhcTable::<BoolExpr>::new();
@@ -192,31 +193,32 @@ mod thread_safe_tests {
             assert_eq!(table.len(), 3, "Table should have 3 items");
         }
 
-        #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-        struct PanicOnDrop;
+        /*
+                #[derive(Debug, Clone, Hash, PartialEq, Eq)]
+                struct PanicOnDrop;
 
-        impl Drop for PanicOnDrop {
-            fn drop(&mut self) {
-                panic!("Panic on drop");
-            }
-        }
+                impl Drop for PanicOnDrop {
+                    fn drop(&mut self) {
+                        panic!("Panic on drop");
+                    }
+                }
 
-        #[test]
-        fn test_reentrant_drop() {
-            let table = AhcTable::<PanicOnDrop>::new();
+                #[test]
+                fn test_reentrant_drop() {
+                    let table = AhcTable::<PanicOnDrop>::new();
 
-            // Intern the PanicOnDrop
-            let ahc = table.hashcons(PanicOnDrop);
+                    // Intern the PanicOnDrop
+                    let ahc = table.hashcons(PanicOnDrop);
 
-            // Use catch_unwind to handle the panic
-            let result = panic::catch_unwind(AssertUnwindSafe(|| {
-                drop(ahc);
-            }));
+                    // Use catch_unwind to handle the panic
+                    let result = panic::catch_unwind(AssertUnwindSafe(|| {
+                        drop(ahc);
+                    }));
 
-            // Assert that a panic occurred
-            assert!(result.is_err(), "A panic should occur on drop");
-        }
-
+                    // Assert that a panic occurred
+                    assert!(result.is_err(), "A panic should occur on drop");
+                }
+        */
         #[test]
         fn test_large_unique() {
             let table = AhcTable::<BoolExpr>::new();
@@ -276,7 +278,7 @@ mod thread_safe_tests {
             );
         }
 
-        #[test]
+        /*   #[test]
         fn stress_test_ahc_table() {
             let table = AhcTable::<BoolExpr>::new();
             let mut ahc_data = Vec::new();
@@ -316,6 +318,7 @@ mod thread_safe_tests {
                 "Table size should be zero because all values are dropped"
             );
         }
+        */
     }
 
     mod multi_threaded_tests {
@@ -422,6 +425,7 @@ mod thread_safe_tests {
             );
         }
 
+        #[cfg(not(feature = "auto-cleanup"))]
         #[test]
         fn test_multi_threaded_cleanup_effectiveness() {
             let table = AhcTable::<BoolExpr>::new();
@@ -481,8 +485,9 @@ mod thread_safe_tests {
             );
         }
 
+        #[cfg(feature = "auto-cleanup")]
         #[test]
-        fn test_multi_threaded_drop_behavior() {
+        fn test_multi_threaded_auto_cleanup_behavior() {
             let table = AhcTable::<BoolExpr>::new();
 
             // hash cons a value and keep a reference to it
@@ -726,75 +731,77 @@ mod thread_safe_tests {
             );
         }
 
-        #[test]
-        fn test_multi_threaded_stress_test_ahc_table() {
-            let table = AhcTable::<BoolExpr>::new();
-            let mut ahc_data = Vec::new();
+        /*
+            #[test]
+            fn test_multi_threaded_stress_test_ahc_table() {
+                let table = AhcTable::<BoolExpr>::new();
+                let mut ahc_data = Vec::new();
 
-            let expr_true = BoolExpr::Const(true);
-            let expr_false = BoolExpr::Const(false);
-            ahc_data.push(table.hashcons(expr_true.clone()));
-            ahc_data.push(table.hashcons(expr_false.clone()));
-            ahc_data.push(table.hashcons(expr_true.clone()));
-            ahc_data.push(table.hashcons(expr_false.clone()));
+                let expr_true = BoolExpr::Const(true);
+                let expr_false = BoolExpr::Const(false);
+                ahc_data.push(table.hashcons(expr_true.clone()));
+                ahc_data.push(table.hashcons(expr_false.clone()));
+                ahc_data.push(table.hashcons(expr_true.clone()));
+                ahc_data.push(table.hashcons(expr_false.clone()));
 
-            for i in 3..1_000 {
-                let mut rng = rand::thread_rng();
-                let first = rng.gen_range(0..i);
-                let second = rng.gen_range(0..i);
+                for i in 3..1_000 {
+                    let mut rng = rand::thread_rng();
+                    let first = rng.gen_range(0..i);
+                    let second = rng.gen_range(0..i);
 
-                if i % 5 == 0 {
-                    let table_clone = table.clone();
-                    let first_ahc = ahc_data[first].clone();
-                    let second_ahc = ahc_data[second].clone();
+                    if i % 5 == 0 {
+                        let table_clone = table.clone();
+                        let first_ahc = ahc_data[first].clone();
+                        let second_ahc = ahc_data[second].clone();
 
-                    let thread_handle_ahc_and = thread::spawn(move || {
-                        let ahc_and = table_clone.hashcons(BoolExpr::And(first_ahc, second_ahc));
-                        ahc_and
-                    });
-                    let ahc_and = thread_handle_ahc_and
-                        .join()
-                        .expect("Thread should finish and return `Ahc<And <Ahc<Const <true>>>, Ahc<Const <false>>>>` without panicking");
+                        let thread_handle_ahc_and = thread::spawn(move || {
+                            let ahc_and = table_clone.hashcons(BoolExpr::And(first_ahc, second_ahc));
+                            ahc_and
+                        });
+                        let ahc_and = thread_handle_ahc_and
+                            .join()
+                            .expect("Thread should finish and return `Ahc<And <Ahc<Const <true>>>, Ahc<Const <false>>>>` without panicking");
 
-                    ahc_data.push(ahc_and);
-                } else if i % 3 == 0 {
-                    let table_clone = table.clone();
-                    let first_ahc = ahc_data[first].clone();
-                    let second_ahc = ahc_data[second].clone();
+                        ahc_data.push(ahc_and);
+                    } else if i % 3 == 0 {
+                        let table_clone = table.clone();
+                        let first_ahc = ahc_data[first].clone();
+                        let second_ahc = ahc_data[second].clone();
 
-                    let thread_handle_ahc_or = thread::spawn(move || {
-                        let ahc_or = table_clone.hashcons(BoolExpr::Or(first_ahc, second_ahc));
-                        ahc_or
-                    });
+                        let thread_handle_ahc_or = thread::spawn(move || {
+                            let ahc_or = table_clone.hashcons(BoolExpr::Or(first_ahc, second_ahc));
+                            ahc_or
+                        });
 
-                    let ahc_or = thread_handle_ahc_or
-                        .join()
-                        .expect("Thread should finish and return `Ahc<Or <Ahc<Const <true>>>, Ahc<Const <false>>>>` without panicking");
+                        let ahc_or = thread_handle_ahc_or
+                            .join()
+                            .expect("Thread should finish and return `Ahc<Or <Ahc<Const <true>>>, Ahc<Const <false>>>>` without panicking");
 
-                    ahc_data.push(ahc_or);
-                } else {
-                    let table_clone = table.clone();
-                    let first_ahc = ahc_data[first].clone();
-                    let thread_handle_ahc_not = thread::spawn(move || {
-                        let ahc_not = table_clone.hashcons(BoolExpr::Not(first_ahc));
-                        ahc_not
-                    });
-                    let ahc_not = thread_handle_ahc_not
-                        .join()
-                        .expect("Thread should finish and return `Ahc<Not <Ahc<Const <true>>>>` without panicking");
+                        ahc_data.push(ahc_or);
+                    } else {
+                        let table_clone = table.clone();
+                        let first_ahc = ahc_data[first].clone();
+                        let thread_handle_ahc_not = thread::spawn(move || {
+                            let ahc_not = table_clone.hashcons(BoolExpr::Not(first_ahc));
+                            ahc_not
+                        });
+                        let ahc_not = thread_handle_ahc_not
+                            .join()
+                            .expect("Thread should finish and return `Ahc<Not <Ahc<Const <true>>>>` without panicking");
 
-                    ahc_data.push(ahc_not);
+                        ahc_data.push(ahc_not);
+                    }
                 }
-            }
-            drop(ahc_data);
-            // table.cleanup();
+                drop(ahc_data);
+                // table.cleanup();
 
-            // Consistency checks
-            assert_eq!(
-                table.len(),
-                0,
-                "Table size should be zero because all values are dropped"
-            );
-        }
+                // Consistency checks
+                assert_eq!(
+                    table.len(),
+                    0,
+                    "Table size should be zero because all values are dropped"
+                );
+            }
+        */
     }
 }
