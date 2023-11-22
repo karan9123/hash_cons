@@ -61,25 +61,25 @@
 //!
 //! // Thread-safe example
 //! #[cfg(feature = "thread-safe")]
-//! use hash_cons::{AhcTable, Ahc};
+//! use hash_cons::{HcTable, Hc};
 //! use std::thread;
 //!
 //! #[cfg(feature = "thread-safe")]
 //! #[derive(Hash, PartialEq, Eq)]
 //! enum BoolExpr {
 //!     Const(bool),
-//!     And(Ahc<BoolExpr>, Ahc<BoolExpr>),
-//!     Or(Ahc<BoolExpr>, Ahc<BoolExpr>),
-//!     Not(Ahc<BoolExpr>),
+//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
+//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
+//!     Not(Hc<BoolExpr>),
 //! }
 //!
 //! #[cfg(feature = "thread-safe")]
 //! fn main() {
-//! let table: AhcTable<BoolExpr> = AhcTable::new();
+//! let table: HcTable<BoolExpr> = HcTable::new();
 //!     let thread_handle_ahc_false = thread::spawn(move || {
 //!         table.hashcons(BoolExpr::Const(false))
 //!     });
-//!     let ahc_false: Ahc<BoolExpr> = thread_handle_ahc_false.join().unwrap(); // Safe for concurrent use across threads
+//!     let ahc_false: Hc<BoolExpr> = thread_handle_ahc_false.join().unwrap(); // Safe for concurrent use across threads
 //! }
 //! ```
 //!

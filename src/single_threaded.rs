@@ -16,10 +16,12 @@ use std::rc::{Rc, Weak};
 ///
 /// ## Example
 /// ```
-/// use hash_cons::single_threaded::Hc;
-/// use hash_cons::single_threaded::HcTable;
+/// use hash_cons::Hc;
+/// use hash_cons::HcTable;
+///
 /// let table = HcTable::new();
 /// let hc_pointer = table.hashcons(42);
+///
 /// assert_eq!(*hc_pointer.get(), 42);
 /// ```
 pub struct Hc<T>
@@ -40,9 +42,11 @@ where
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let my_value = table.hashcons(10);
+    ///
     /// assert_eq!(*my_value.get(), 10);
     /// ```
     pub fn get(&self) -> &T {
@@ -64,11 +68,13 @@ where
     ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(5);
     /// let value3 = table.hashcons(10);
+    ///
     /// assert_eq!(value1, value2);
     /// assert_ne!(value1, value3);
     /// ```
@@ -87,15 +93,19 @@ where
     /// This method is useful for storing `Hc<T>` instances in a `HashMap`.
     /// It is also used internally by the `HCTable` to manage the storage of
     /// `Hc<T>` instances.
+    ///
     /// ## Parameters
     /// * `state`: The `Hasher` instance to use for hashing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
     /// use std::collections::hash_map::DefaultHasher;
     /// use std::hash::{Hash, Hasher};
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
+    ///
     /// let mut hasher = DefaultHasher::new();
     /// value.hash(&mut hasher);
     /// let hash = hasher.finish();
@@ -110,14 +120,18 @@ where
     T: Hash + Eq,
 {
     /// Provides the functionality to clone `Hc<T>` instances.
+    ///
     /// ## Returns
     /// A new `Hc<T>` instance with the same value as the original.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
     /// let value_clone = value.clone();
+    ///
     /// assert_eq!(value, value_clone);
     /// ```
     /// ## Note
@@ -141,13 +155,17 @@ where
 {
     /// Provides the functionality to print `Hc<T>` instances.
     /// This method is useful for debugging.
+    ///
     /// ## Parameters
     /// * `f`: The `Formatter` instance to use for printing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
+    ///
     /// println!("{:?}", value);
     /// ```
     ///
@@ -162,13 +180,17 @@ where
 {
     /// Provides the functionality to print `Hc<T>` instances.
     /// This method is useful for debugging.
+    ///
     /// ## Parameters
     /// * `f`: The `Formatter` instance to use for printing.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
+    ///
     /// println!("{}", value);
     /// ```
     ///
@@ -185,13 +207,17 @@ where
 
     /// Provides the functionality to dereference `Hc<T>` instances.
     /// This method is useful for accessing the underlying value.
+    ///
     /// ## Returns
     /// A reference to the underlying value.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
+    ///
     /// assert_eq!(*value, 5);
     /// ```
     /// ## Note
@@ -213,13 +239,17 @@ where
 {
     /// Provides the functionality to convert `Hc<T>` instances to references.
     /// This method is useful for accessing the underlying value.
+    ///
     /// ## Returns
     /// A reference to the underlying value.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value = table.hashcons(5);
+    ///
     /// assert_eq!(value.as_ref(), &5);
     /// ```
     /// ## Note
@@ -241,16 +271,21 @@ where
 {
     /// Provides the functionality to compare two `Hc<T>` instances.
     /// This method is useful for sorting `Hc<T>` instances.
+    ///
     /// ## Parameters
     /// * `other`: Another `Hc<T>` instance to compare with.
+    ///
     /// ## Returns
     /// `Some(std::cmp::Ordering)` if the two instances are comparable, `None` otherwise.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
+    ///
     /// assert!(value1 < value2);
     /// ```
     /// ## Note
@@ -269,16 +304,21 @@ where
 {
     /// Provides the functionality to compare two `Hc<T>` instances.
     /// This method is useful for sorting `Hc<T>` instances.
+    ///
     /// ## Parameters
     /// * `other`: Another `Hc<T>` instance to compare with.
+    ///
     /// ## Returns
     /// `std::cmp::Ordering` if the two instances are comparable.
+    ///
     /// ## Example
     /// ```
-    /// use hash_cons::single_threaded::HcTable;
+    /// use hash_cons::HcTable;
+    ///
     /// let table = HcTable::new();
     /// let value1 = table.hashcons(5);
     /// let value2 = table.hashcons(10);
+    ///
     /// assert!(value1 < value2);
     /// ```
     /// ## Note
@@ -476,6 +516,7 @@ where
     T: Hash + Eq,
 {
     /// Creates a new `InnerTable<T>`.
+    ///
     /// ## Returns
     /// A new instance of `InnerTable<T>`.
     ///
@@ -486,6 +527,7 @@ where
     }
 
     /// Returns the number of elements currently stored in the `InnerTable`.
+    ///
     /// ## Returns
     /// The number of elements in the `InnerTable`.
     ///
@@ -497,6 +539,7 @@ where
     /// Cleans up the `InnerTable`, removing any values that are no longer in use.
     /// This method is useful for managing memory and ensuring that unused
     /// values are not unnecessarily kept in the table.
+    ///
     /// ## Note
     /// This method is implemented using `Weak::strong_count()`.
     /// It removes any values that have a `strong_count()` of 0.
