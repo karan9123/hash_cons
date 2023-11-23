@@ -47,14 +47,9 @@
 //! ## Examples
 //!
 //! ```rust
-//!
-//!
-//! // Single-threaded usage with auto_cleanup enabled by default
-//!
-//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
 //! use hash_cons::{HcTable, Hc};
 //!
-//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
+//! /// A simple boolean expression
 //! #[derive(Hash, PartialEq, Eq)]
 //! enum BoolExpr {
 //!     Const(bool),
@@ -62,6 +57,9 @@
 //!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
 //!     Not(Hc<BoolExpr>),
 //! }
+//!
+//!
+//! /// Single-threaded usage with auto_cleanup enabled by default
 //!
 //! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
 //! fn main() {
@@ -73,19 +71,7 @@
 //! }
 //!
 //!
-//! //single-threaded usage with auto_cleanup disabled
-//!
-//! #[cfg(all(not(feature = "thread-safe"), not(feature = "auto-cleanup")))]
-//! use hash_cons::{HcTable, Hc};
-//!
-//! #[cfg(all(not(feature = "thread-safe"), not(feature = "auto-cleanup")))]
-//! #[derive(Hash, PartialEq, Eq)]
-//! enum BoolExpr {
-//!     Const(bool),
-//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Not(Hc<BoolExpr>),
-//! }
+//! ///single-threaded usage with auto_cleanup disabled
 //!
 //! #[cfg(all(not(feature = "thread-safe"), not(feature = "auto-cleanup")))]
 //! fn main() {
@@ -99,20 +85,10 @@
 //! }
 //!
 //!
-//! // Thread-safe usage with auto_cleanup enabled
+//! /// Thread-safe usage with auto_cleanup enabled
 //!
-//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! use hash_cons::{HcTable, Hc};
 //! use std::thread;
 //!
-//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! #[derive(Hash, PartialEq, Eq)]
-//! enum BoolExpr {
-//!     Const(bool),
-//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Not(Hc<BoolExpr>),
-//! }
 //!
 //! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
 //! fn main() {
@@ -127,19 +103,7 @@
 //! }
 //!
 //!
-//! // Thread-safe usage with auto_cleanup disabled
-//!
-//! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
-//! use hash_cons::{HcTable, Hc};
-//!
-//! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
-//! #[derive(Hash, PartialEq, Eq)]
-//! enum BoolExpr {
-//!     Const(bool),
-//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Not(Hc<BoolExpr>),
-//! }
+//! /// Thread-safe usage with auto_cleanup disabled
 //!
 //! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
 //! fn main() {

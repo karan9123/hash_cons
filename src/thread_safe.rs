@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::sync::{Arc, RwLock, Weak};
 
-/// # Hc<T>
+/// # `Hc<T>`
 /// A thread-safe custom smart pointer type for managing the lifecycle of consed values.
 ///
 /// ## Type Parameters
@@ -332,7 +332,7 @@ where
     }
 }
 
-///  # HcTable<T>
+///  # `HcTable<T>`
 /// A table structure for efficiently managing `Hc<T>` instances.
 /// This struct hides the underlying table and its reference count management.
 ///
