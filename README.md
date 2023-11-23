@@ -168,7 +168,3 @@ We welcome contributions and suggestions to make `hash_cons` better. If you have
 ## License
 
 Licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-```
-
-```
