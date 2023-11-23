@@ -48,11 +48,13 @@
 //!
 //! ```rust
 //!
+//!
 //! // Single-threaded usage with auto_cleanup enabled by default
-//! #[cfg(not(feature = "thread-safe"))]
+//!
+//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
 //! use hash_cons::{HcTable, Hc};
 //!
-//! #[cfg(not(feature = "thread-safe"))]
+//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
 //! #[derive(Hash, PartialEq, Eq)]
 //! enum BoolExpr {
 //!     Const(bool),
@@ -61,7 +63,7 @@
 //!     Not(Hc<BoolExpr>),
 //! }
 //!
-//! #[cfg(not(feature = "thread-safe"))]
+//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
 //! fn main() {
 //!     let table: HcTable<BoolExpr> = HcTable::new();
 //!     let const_true = BoolExpr::Const(true);
@@ -71,34 +73,8 @@
 //! }
 //!
 //!
-//! // Thread-safe usage with auto_cleanup enabled
-//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! use hash_cons::{HcTable, Hc};
-//! use std::thread;
-//!
-//!  #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! #[derive(Hash, PartialEq, Eq)]
-//! enum BoolExpr {
-//!     Const(bool),
-//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
-//!     Not(Hc<BoolExpr>),
-//! }
-//!
-//!  #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! fn main() {
-//!     let table: HcTable<BoolExpr> = HcTable::new();
-//!     let table_clone = table.clone();
-//!     let thread_handle_hc_false = thread::spawn(move || {
-//!         table_clone.hashcons(BoolExpr::Const(false))
-//!     });
-//!     let hc_false: Hc<BoolExpr> = thread_handle_hc_false.join().unwrap(); // Safe for concurrent use across threads
-//!     drop(hc_false);
-//!     assert_eq!(table.len(), 0);
-//! }
-//!
-//!
 //! //single-threaded usage with auto_cleanup disabled
+//!
 //! #[cfg(all(not(feature = "thread-safe"), not(feature = "auto-cleanup")))]
 //! use hash_cons::{HcTable, Hc};
 //!
@@ -123,7 +99,36 @@
 //! }
 //!
 //!
+//! // Thread-safe usage with auto_cleanup enabled
+//!
+//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
+//! use hash_cons::{HcTable, Hc};
+//! use std::thread;
+//!
+//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
+//! #[derive(Hash, PartialEq, Eq)]
+//! enum BoolExpr {
+//!     Const(bool),
+//!     And(Hc<BoolExpr>, Hc<BoolExpr>),
+//!     Or(Hc<BoolExpr>, Hc<BoolExpr>),
+//!     Not(Hc<BoolExpr>),
+//! }
+//!
+//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
+//! fn main() {
+//!     let table: HcTable<BoolExpr> = HcTable::new();
+//!     let table_clone = table.clone();
+//!     let thread_handle_hc_false = thread::spawn(move || {
+//!         table_clone.hashcons(BoolExpr::Const(false))
+//!     });
+//!     let hc_false: Hc<BoolExpr> = thread_handle_hc_false.join().unwrap(); // Safe for concurrent use across threads
+//!     drop(hc_false);
+//!     assert_eq!(table.len(), 0);
+//! }
+//!
+//!
 //! // Thread-safe usage with auto_cleanup disabled
+//!
 //! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
 //! use hash_cons::{HcTable, Hc};
 //!

@@ -57,7 +57,7 @@ mod single_threaded_tests {
     /// This test is only run when the auto-cleanup feature is disabled.
     #[cfg(not(feature = "auto-cleanup"))]
     #[test]
-    fn test_cleanup_effectiveness() {
+    fn test_manual_cleanup_effectiveness() {
         let table = HcTable::<BoolExpr>::new();
 
         // hash cons several values

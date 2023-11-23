@@ -58,7 +58,7 @@ mod thread_safe_tests {
 
         #[cfg(not(feature = "auto-cleanup"))]
         #[test]
-        fn test_cleanup_effectiveness() {
+        fn test_manual_cleanup_effectiveness() {
             let table = HcTable::<BoolExpr>::new();
 
             // hash cons several values
@@ -92,7 +92,7 @@ mod thread_safe_tests {
 
         #[cfg(feature = "auto-cleanup")]
         #[test]
-        fn test_drop_behavior() {
+        fn test_auto_cleanup_behavior() {
             let table = HcTable::<BoolExpr>::new();
 
             // hash cons a value and keep a reference to it
@@ -427,7 +427,7 @@ mod thread_safe_tests {
 
         #[cfg(not(feature = "auto-cleanup"))]
         #[test]
-        fn test_multi_threaded_cleanup_effectiveness() {
+        fn test_multi_threaded_manual_cleanup_effectiveness() {
             let table = HcTable::<BoolExpr>::new();
 
             // hash cons several values

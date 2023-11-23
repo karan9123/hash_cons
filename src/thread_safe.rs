@@ -659,8 +659,8 @@ where
             // Flag to check if any weak references are dropped in this iteration
             let mut dropped = false;
 
-            mut_table.retain(|_, weak_Hc: &mut Weak<Inner<T>>| {
-                if weak_Hc.strong_count() == 0 {
+            mut_table.retain(|_, weak_hc: &mut Weak<Inner<T>>| {
+                if weak_hc.strong_count() == 0 {
                     dropped = true; // A weak reference was dropped
                     false // Remove this entry
                 } else {
