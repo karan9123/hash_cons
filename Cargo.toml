@@ -9,7 +9,7 @@ license = "MIT"
 repository = "https://github.com/karan9123/hash_cons"
 homepage = "https://github.com/karan9123/hash_cons"
 documentation = "https://docs.rs/hash_cons"
-keywords = [ "hash-cons", "interning", "memoization", "hash cons", "hashcons"]
+keywords = [ "hash-cons", "interning", "memoization", "hash_cons", "hashcons"]
 categories = ["data-structures", "interning", "memoization", "caching", "asynchronous"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
