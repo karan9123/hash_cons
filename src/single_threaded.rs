@@ -225,8 +225,6 @@ where
     /// This method does not actually dereference the underlying value. Instead, it
     /// returns a reference to the value.
     /// This is the desired behavior for hash consing.
-    /// If you need to dereference the underlying value, you can use the `get()` method
-    /// to retrieve a reference to the value.
     ///
     fn deref(&self) -> &Self::Target {
         &self.inner.elem
@@ -257,9 +255,6 @@ where
     /// This method does not actually convert the underlying value to a reference. Instead, it
     /// returns a reference to the value.
     /// This is the desired behavior for hash consing.
-    /// If you need to convert the underlying value to a reference, you can use the `get()` method
-    /// to retrieve a reference to the value.
-    ///
     fn as_ref(&self) -> &T {
         &self.inner.elem
     }
@@ -441,6 +436,31 @@ where
     }
 }
 
+impl<T> Clone for HcTable<T>
+where
+    T: Hash + Eq,
+{
+    /// Provides the functionality to clone `HcTable<T>` instances.
+    ///
+    /// ## Returns
+    /// A new `HcTable<T>` instance with the same values as the original.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::HcTable;
+    ///
+    /// let table = HcTable::new();
+    /// let value = table.hashcons(5);
+    /// let table_clone = table.clone();
+    ///
+    /// assert_eq!(table.len(), table_clone.len());
+    /// ```
+    fn clone(&self) -> Self {
+        HcTable {
+            inner: self.inner.clone(),
+        }
+    }
+}
 /// # Inner<T>
 /// A struct to encapsulate the inner workings of `Hc<T>`.
 /// It holds the actual value and a weak reference to its containing table.
