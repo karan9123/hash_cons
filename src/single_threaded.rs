@@ -441,6 +441,39 @@ where
     }
 }
 
+impl<T> Clone for HcTable<T>
+where
+    T: Hash + Eq,
+{
+    /// Provides the functionality to clone `HcTable<T>` instances.
+    ///
+    /// ## Returns
+    /// A new `HcTable<T>` instance with the same values as the original.
+    ///
+    /// ## Example
+    /// ```
+    /// use hash_cons::HcTable;
+    ///
+    /// let table = HcTable::new();
+    /// let value = table.hashcons(5);
+    /// let table_clone = table.clone();
+    ///
+    /// assert_eq!(table.len(), table_clone.len());
+    /// ```
+    /// ## Note
+    /// This method is implemented using `Rc::clone()`.
+    /// This method does not actually clone the underlying value. Instead, it
+    /// creates a new `Hc<T>` instance that points to the same value.
+    /// This is the desired behavior for hash consing.
+    /// If you need to clone the underlying value, you can use the `get()` method
+    /// to retrieve a reference to the value and clone it.
+    ///
+    fn clone(&self) -> Self {
+        HcTable {
+            inner: self.inner.clone(),
+        }
+    }
+}
 /// # Inner<T>
 /// A struct to encapsulate the inner workings of `Hc<T>`.
 /// It holds the actual value and a weak reference to its containing table.
