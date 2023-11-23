@@ -88,8 +88,9 @@
 //!  #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
 //! fn main() {
 //!     let table: HcTable<BoolExpr> = HcTable::new();
+//!     let table_clone = table.clone();
 //!     let thread_handle_hc_false = thread::spawn(move || {
-//!         table.hashcons(BoolExpr::Const(false))
+//!         table_clone.hashcons(BoolExpr::Const(false))
 //!     });
 //!     let hc_false: Hc<BoolExpr> = thread_handle_hc_false.join().unwrap(); // Safe for concurrent use across threads
 //!     drop(hc_false);
@@ -138,8 +139,11 @@
 //! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
 //! fn main() {
 //!     let table: HcTable<BoolExpr> = HcTable::new();
-//!     let const_true = BoolExpr::Const(true);
-//!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
+//!     let table_clone = table.clone();
+//!     let thread_handle_hc_true = thread::spawn(move || {
+//!         table_clone.hashcons(BoolExpr::Const(true))
+//!     });
+//!     let hc_true: Hc<BoolExpr> = thread_handle_hc_true.join().unwrap(); // Safe for concurrent use across threads
 //!     assert_eq!(table.len(), 1);
 //!     drop(hc_true);
 //!     table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
