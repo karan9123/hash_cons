@@ -3,7 +3,7 @@ name = "hash_cons"
 authors = ["Karan Ahluwalia <karan9123@gmail.com>"]
 version = "0.1.1"
 edition = "2021"
-description = "A type-safe hash consing library"
+description = "A type-safe hash-cons library."
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/karan9123/hash_cons"
@@ -15,9 +15,9 @@ categories = ["data-structures", "interning", "memoization", "caching", "asynchr
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
-default = ["single-threaded"]
-single-threaded = []
+default = ["auto-cleanup"]
 thread-safe = []
+auto-cleanup = []
 
 [dev-dependencies]
 rand = "0.8.5"
