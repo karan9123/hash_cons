@@ -72,6 +72,7 @@ fn main() {
     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
     drop(hc_true);// hc_true is automatically removed from the table when dropped from the memory
 }
+
 ```
 
 ### Thread-Safe Usage
@@ -102,7 +103,7 @@ fn main() {
 }
 ```
 
-### Auto Cleanup Disabled
+### Auto Cleanup Disabled for single-threaded environments
 
 ```toml
 [dependencies]
@@ -125,7 +126,38 @@ fn main() {
     let const_true = BoolExpr::Const(true);
     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
     drop(hc_true);
+    assert_eq!(table.len(), 1);
     table.cleanup();//hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
+    assert_eq!(table.len(), 0);
+}
+```
+
+### Auto Cleanup Disabled for thread-safe environments
+
+```toml
+hash_cons = { version = "0.1.2", default-features = false, features = ["thread-safe"] }
+```
+
+```rust
+
+use hash_cons::{HcTable, Hc};
+
+#[derive(Hash, PartialEq, Eq)]
+enum BoolExpr {
+    Const(bool),
+    And(Hc<BoolExpr>, Hc<BoolExpr>),
+    Or(Hc<BoolExpr>, Hc<BoolExpr>),
+    Not(Hc<BoolExpr>),
+}
+
+fn main() {
+    let table: HcTable<BoolExpr> = HcTable::new();
+    let const_true = BoolExpr::Const(true);
+    let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
+    drop(hc_true);
+    assert_eq!(table.len(), 1);
+    table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
+    assert_eq!(table.len(), 0);
 }
 ```
 
@@ -136,3 +168,7 @@ We welcome contributions and suggestions to make `hash_cons` better. If you have
 ## License
 
 Licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+```
+
+```
