@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::rc::{Rc, Weak};
 
-/// # Hc<T>
+/// # `Hc<T>`
 /// A single-threaded custom smart pointer type for managing the lifecycle of consed values.
 ///
 /// ## Type Parameters
@@ -326,7 +326,7 @@ where
     }
 }
 
-///  # HCTable<T>
+/// # `HCTable<T>`
 /// A table structure for efficiently managing `Hc<T>` instances.
 /// This struct hides the underlying table and its reference count management.
 ///
@@ -511,7 +511,7 @@ where
     }
 }
 
-/// # InnerTable<T>
+/// # `InnerTable<T>`
 /// A helper struct to manage the internal storage of `HCTable`.
 /// It provides mechanisms to manage and access stored `Hc<T>` instances.
 ///
