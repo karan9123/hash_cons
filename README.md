@@ -104,11 +104,10 @@ fn main() {
 
 ### Auto Cleanup Disabled
 
-````toml
 ```toml
 [dependencies]
 hash_cons = { version = "0.1.2", default-features = false }
-````
+```
 
 ```rust
 use hash_cons::{HcTable, Hc};
