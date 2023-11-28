@@ -401,14 +401,14 @@ where
                 }
 
                 let elem = rc_value;
-                let _table = Rc::downgrade(&rc_table);
+                let _table = rc_table;
                 let new_elem = Rc::new(Inner { elem, _table });
                 o.insert(Rc::downgrade(&new_elem));
                 new_elem
             }
 
             Entry::Vacant(v) => {
-                let _table = Rc::downgrade(&rc_table);
+                let _table = rc_table;
                 let elem = rc_value;
                 let new_elem = Rc::new(Inner { elem, _table });
                 v.insert(Rc::downgrade(&new_elem));
@@ -461,6 +461,7 @@ where
         }
     }
 }
+
 /// # Inner<T>
 /// A struct to encapsulate the inner workings of `Hc<T>`.
 /// It holds the actual value and a weak reference to its containing table.
@@ -480,9 +481,9 @@ where
     /// This is the value that is returned when the `Hc<T>` is dereference.
     elem: Rc<T>,
 
-    /// A weak reference to the `HCTable` that contains this value.
+    /// A reference counted pointer to the `HCTable` that contains this value.
     /// This is used to remove the value from the table when it is no longer in use.
-    _table: Weak<InnerTable<T>>,
+    _table: Rc<InnerTable<T>>,
 }
 
 #[cfg(feature = "auto-cleanup")]
@@ -492,22 +493,12 @@ where
 {
     /// Provides the functionality to drop `Inner<T>` instances.
     /// This method is useful for managing the lifecycle of `Hc<T>` instances.
-    /// ## Note
-    /// This method is implemented using `Weak::upgrade()`.
     fn drop(&mut self) {
-        let weak_table = self._table.clone();
-        match weak_table.upgrade() {
-            Some(rc_table) => {
-                let key = self.elem.clone();
-                let mut mut_table = rc_table.table.borrow_mut();
-                mut_table.remove_entry(&key);
-            }
-            None => {
-                // The table has already been dropped;
-                #[cfg(debug_assertions)]
-                eprintln!("Warning: InnerTable<T> already dropped when trying to remove Inner<T>.");
-            }
-        }
+        let rc_table = self._table.clone();
+
+        let key = self.elem.clone();
+        let mut mut_table = rc_table.table.borrow_mut();
+        mut_table.remove_entry(&key);
     }
 }
 
