@@ -434,14 +434,14 @@ where
 
                 let elem = rc_value;
 
-                let _table = Arc::downgrade(&arc_table);
+                let _table = arc_table;
                 let new_elem = Arc::new(Inner { elem, _table });
                 o.insert(Arc::downgrade(&new_elem));
                 new_elem
             }
 
             Entry::Vacant(v) => {
-                let _table = Arc::downgrade(&arc_table);
+                let _table = arc_table;
                 let elem = rc_value;
                 let new_elem = Arc::new(Inner { elem, _table });
                 v.insert(Arc::downgrade(&new_elem));
@@ -526,7 +526,7 @@ where
 ///
 /// ## Fields
 /// * `elem`: The actual stored value.
-/// * `_table`: A weak reference to the `HcTable` that contains this value.
+/// * `_table`: An atomic reference counted pointer to the `HcTable` that contains this value.
 ///
 struct Inner<T>
 where
@@ -534,7 +534,7 @@ where
 {
     elem: Arc<T>,
 
-    _table: Weak<InnerTable<T>>,
+    _table: Arc<InnerTable<T>>,
 }
 
 #[cfg(feature = "auto-cleanup")]
@@ -544,10 +544,6 @@ where
 {
     /// Provides the functionality to drop `Inner<T>` instances.
     /// This method is useful for managing the lifecycle of `Hc<T>` instances.
-    ///
-    /// ## Note
-    /// This method is implemented using `Weak::upgrade()`.
-    /// It removes the entry from the table if the table still exists.
     ///
     /// ## Example
     /// ```
@@ -561,27 +557,19 @@ where
     /// ```
     ///
     fn drop(&mut self) {
-        let weak_table = self._table.clone();
-        match weak_table.upgrade() {
-            Some(arc_table) => {
-                let key = self.elem.clone();
-                let mut_table_result = arc_table.table.write();
-                let mut mut_table = match mut_table_result {
-                    Ok(guard) => guard,
-                    Err(poisoned) => {
-                        eprintln!("Mutex is poisoned. Continuing with the poisoned lock.");
-                        poisoned.into_inner() // continues, because we are not using
-                                              // any inconsistent value(if any)
-                    }
-                };
-                mut_table.remove_entry(&key);
+        let arc_table = self._table.clone();
+
+        let key = self.elem.clone();
+        let mut_table_result = arc_table.table.write();
+        let mut mut_table = match mut_table_result {
+            Ok(guard) => guard,
+            Err(poisoned) => {
+                eprintln!("Mutex is poisoned. Continuing with the poisoned lock.");
+                poisoned.into_inner() // continues, because we are not using
+                                      // any inconsistent value(if any)
             }
-            None => {
-                // The table has already been dropped;
-                #[cfg(debug_assertions)]
-                eprintln!("Warning: InnerTable<T> already dropped when trying to remove Inner<T>.");
-            }
-        }
+        };
+        mut_table.remove_entry(&key);
     }
 }
 
