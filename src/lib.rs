@@ -24,23 +24,23 @@
 //!
 //! ```toml
 //! [dependencies]
-//! hash_cons = "0.1.3"  # Replace with the actual version
+//! hash_cons = "0.1.4"  # Replace with the actual version
 //! ```
 //!
 //! By default, the library operates in a single-threaded environment with auto_cleanup enabled. For multi-threaded support, enable the `thread-safe` feature:
 //!
 //! ```toml
 //! # Default single-threaded with auto_cleanup enabled
-//! hash_cons = "0.1.3"
+//! hash_cons = "0.1.4"
 //!
 //! # For multi-threaded environments with auto_cleanup enabled
-//! hash_cons = { version = "0.1.3", features = ["thread-safe"] }
+//! hash_cons = { version = "0.1.4", features = ["thread-safe"] }
 //!
 //! # For single-threaded environments with auto_cleanup disabled
-//! hash_cons = { version = "0.1.3", default-features = false }
+//! hash_cons = { version = "0.1.4", default-features = false }
 //!
 //! # For multi-threaded environments with auto_cleanup disabled
-//! hash_cons = { version = "0.1.3", default-features = false, features = ["thread-safe"] }
+//! hash_cons = { version = "0.1.4", default-features = false, features = ["thread-safe"] }
 //!
 //! ```
 //!
