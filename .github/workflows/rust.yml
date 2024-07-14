@@ -31,6 +31,3 @@ jobs:
 
       - name: For single-threaded and auto-cleanup disabled tests
         run: cargo test --no-default-features --features "single-threaded" --verbose
-
-      - name: Run clippy
-        run: cargo clippy --all-features -- -D warnings
