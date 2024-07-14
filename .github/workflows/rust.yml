@@ -13,20 +13,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      
       - name: Format
         run: cargo fmt --verbose
 
       - name: Build
         run: cargo build --all-features --verbose
 
-      - name: For single-threaded and auto-cleanup enabled tests
+      - name: For multi-threaded and auto-cleanup enabled tests (default)
         run: cargo test --verbose
 
-      - name: For single-threaded and auto-cleanup disabled tests
+      - name: For multi-threaded and auto-cleanup disabled tests
         run: cargo test --no-default-features --verbose
 
-      - name: For multi-threaded and auto-cleanup disabled tests
-        run: cargo test  --no-default-features --features "thread-safe" --verbose
+      - name: For single-threaded and auto-cleanup enabled tests
+        run: cargo test --features "single_threaded" --verbose
 
-      - name: For multi-threaded and auto-cleanup enabled tests
-        run: cargo test --all-features --verbose
+      - name: For single-threaded and auto-cleanup disabled tests
+        run: cargo test --no-default-features --features "single_threaded" --verbose
+
+      - name: Run clippy
+        run: cargo clippy --all-features -- -D warnings
