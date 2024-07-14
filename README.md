@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/hash_cons.svg)](https://crates.io/crates/hash_cons)
 [![docs.rs](https://docs.rs/hash_cons/badge.svg)](https://docs.rs/hash_cons)
 
-The Hash Cons Library (`hash_cons`) is a Rust library that implements efficient hash consing techniques, making it a robust choice for both single-threaded and multi-threaded Rust applications.
+The Hash Cons Library (`hash_cons`) is a Rust library that implements efficient hash consing techniques, making it a robust choice for both multi-threaded and single-threaded Rust applications.
 At its core, the library is designed to focus on type-safety, efficiency, and zero-cost abstractions.
 
 ## Hash Cons
@@ -18,8 +18,8 @@ This library is designed to be inherently idiomatic to Rust, ensuring efficient 
 
 - **auto_cleanup**: Enabled by default, this feature allows the library to automatically clean up and
   manage memory efficiently by removing unused entries.
-- **thread_safe**: Disabled by default, enabling this feature allows the library to be used in
-  multi-threaded environments safely.
+- **single-threaded**: Disabled by default, enabling this feature switches the library to a single-threaded
+  implementation for environments where thread safety is not required. Users may notice some performance issues in multi-threaded environemnts.
 
 ## Usage
 
@@ -27,59 +27,32 @@ To integrate `hash_cons` into your project, add it as a dependency in your `Carg
 
 ```toml
 [dependencies]
-hash_cons = "0.1.4"  # Replace with the actual version
+hash_cons = "0.2.0"  # Replace with the actual version
 ```
 
-By default, the library operates in a single-threaded environment with auto_cleanup enabled. For multi-threaded support, enable the `thread-safe` feature:
+By default, the library operates in a multi-threaded environment with auto_cleanup enabled. For single-threaded support, enable the `single-threaded` feature:
 
 ```toml
-# Default single-threaded with auto_cleanup enabled
-hash_cons = "0.1.4"
+# Default multi-threaded with auto_cleanup enabled
+hash_cons = "0.2.0"
 
-# For single-threaded environments with auto_cleanup disabled
-hash_cons = { version = "0.1.4", default-features = false }
-
-# For multi-threaded environments with auto_cleanup enabled
-hash_cons = { version = "0.1.4", features = ["thread-safe"] }
+# For single-threaded environments with auto_cleanup enabled
+hash_cons = { version = "0.2.0", features = ["single-threaded"] }
 
 # For multi-threaded environments with auto_cleanup disabled
-hash_cons = { version = "0.1.4", default-features = false, features = ["thread-safe"] }
+hash_cons = { version = "0.2.0", default-features = false }
+
+# For single-threaded environments with auto_cleanup disabled
+hash_cons = { version = "0.2.0", default-features = false, features = ["single-threaded"] }
 ```
 
 ## Examples
 
-### Single-Threaded Usage
+### Multi-Threaded Usage (Default)
 
 ```toml
 [dependencies]
-hash_cons = "0.1.4" # Replace with the actual version
-```
-
-```rust
-use hash_cons::{HcTable, Hc};
-
-#[derive(Hash, PartialEq, Eq)]
-enum BoolExpr {
-    Const(bool),
-    And(Hc<BoolExpr>, Hc<BoolExpr>),
-    Or(Hc<BoolExpr>, Hc<BoolExpr>),
-    Not(Hc<BoolExpr>),
-}
-
-fn main() {
-    let table: HcTable<BoolExpr> = HcTable::new();
-    let const_true = BoolExpr::Const(true);
-    let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
-    drop(hc_true);// hc_true is automatically removed from the table when dropped from the memory
-}
-
-```
-
-### Thread-Safe Usage
-
-```toml
-[dependencies]
-hash_cons = { version = "0.1.4", features = ["thread-safe"] }
+hash_cons = "0.2.0" # Replace with the actual version
 ```
 
 ```rust
@@ -103,11 +76,70 @@ fn main() {
 }
 ```
 
+### Single-Threaded Usage
+
+```toml
+[dependencies]
+hash_cons = { version = "0.2.0", features = ["single-threaded"] }
+```
+
+```rust
+use hash_cons::{HcTable, Hc};
+
+#[derive(Hash, PartialEq, Eq)]
+enum BoolExpr {
+    Const(bool),
+    And(Hc<BoolExpr>, Hc<BoolExpr>),
+    Or(Hc<BoolExpr>, Hc<BoolExpr>),
+    Not(Hc<BoolExpr>),
+}
+
+fn main() {
+    let table: HcTable<BoolExpr> = HcTable::new();
+    let const_true = BoolExpr::Const(true);
+    let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
+    drop(hc_true);// hc_true is automatically removed from the table when dropped from the memory
+}
+```
+
+### Auto Cleanup Disabled for multi-threaded environments (Default)
+
+```toml
+[dependencies]
+hash_cons = { version = "0.2.0", default-features = false }
+```
+
+```rust
+use hash_cons::{HcTable, Hc};
+use std::thread;
+
+#[derive(Hash, PartialEq, Eq)]
+enum BoolExpr {
+    Const(bool),
+    And(Hc<BoolExpr>, Hc<BoolExpr>),
+    Or(Hc<BoolExpr>, Hc<BoolExpr>),
+    Not(Hc<BoolExpr>),
+}
+
+fn main() {
+    let table: HcTable<BoolExpr> = HcTable::new();
+    let table_clone = table.clone();
+    let thread_handle_hc_true = thread::spawn(move || {
+         table_clone.hashcons(BoolExpr::Const(true))
+    });
+    let hc_true: Hc<BoolExpr> = thread_handle_hc_true.join().unwrap(); // Safe for concurrent use across threads
+    assert_eq!(table.len(), 1);
+    drop(hc_true);
+    table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
+    assert_eq!(table.len(), 0);
+}
+```
+
 ### Auto Cleanup Disabled for single-threaded environments
 
 ```toml
 [dependencies]
-hash_cons = { version = "0.1.4", default-features = false }
+hash_cons = { version = "0.2.0", default-features = false, features = ["single-threaded"] }
 ```
 
 ```rust
@@ -132,41 +164,9 @@ fn main() {
 }
 ```
 
-### Auto Cleanup Disabled for thread-safe environments
-
-```toml
-hash_cons = { version = "0.1.4", default-features = false, features = ["thread-safe"] }
-```
-
-```rust
-
-use hash_cons::{HcTable, Hc};
-
-#[derive(Hash, PartialEq, Eq)]
-enum BoolExpr {
-    Const(bool),
-    And(Hc<BoolExpr>, Hc<BoolExpr>),
-    Or(Hc<BoolExpr>, Hc<BoolExpr>),
-    Not(Hc<BoolExpr>),
-}
-
-fn main() {
-    let table: HcTable<BoolExpr> = HcTable::new();
-    let table_clone = table.clone();
-    let thread_handle_hc_true = thread::spawn(move || {
-         table_clone.hashcons(BoolExpr::Const(true))
-    });
-    let hc_true: Hc<BoolExpr> = thread_handle_hc_true.join().unwrap(); // Safe for concurrent use across threads
-    assert_eq!(table.len(), 1);
-    drop(hc_true);
-    table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
-    assert_eq!(table.len(), 0);
-}
-```
-
 ## Contributing
 
-We welcome contributions and suggestions to make `hash_cons` better. If you have ideas or improvements, feel free to submit a pull request or open an issue in the [repository](https://github.com/karan9123/hash_cons).
+Contributions and suggestions are welcomed to make `hash_cons` better. If you have ideas or improvements, feel free to submit a pull request or open an issue in the [repository](https://github.com/karan9123/hash_cons).
 
 ## License
 
