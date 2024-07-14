@@ -1,4 +1,4 @@
-#[cfg(feature = "thread-safe")]
+#[cfg(not(feature = "single-threaded"))]
 #[cfg(test)]
 mod thread_safe_tests {
     use hash_cons::Hc;

@@ -1,4 +1,4 @@
-#[cfg(not(feature = "thread_safe"))]
+#[cfg(feature = "single-threaded")]
 use std::cell::RefCell;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;

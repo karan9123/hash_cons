@@ -1,4 +1,4 @@
-#[cfg(not(feature = "thread-safe"))]
+#[cfg(feature = "single-threaded")]
 #[cfg(test)]
 mod single_threaded_tests {
     use hash_cons::{Hc, HcTable};

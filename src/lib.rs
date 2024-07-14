@@ -4,7 +4,7 @@
 //! [![docs.rs](https://docs.rs/hash_cons/badge.svg)](https://docs.rs/hash_cons)
 //!
 //! The Hash Consing Library (`hash_cons`) is a Rust library that implements efficient hash consing techniques,
-//! making it a robust choice for both single-threaded and multi-threaded Rust applications.
+//! making it a robust choice for both multi-threaded and single-threaded Rust applications.
 //! At its core, the library is designed to focus on type-safety, efficiency, and zero-cost abstractions.
 //!
 //! ## Efficiency and Idiomatic Rust
@@ -15,8 +15,8 @@
 //!
 //! - **auto_cleanup**: Enabled by default, this feature allows the library to automatically clean up and
 //!  manage memory efficiently by removing unused entries.
-//!- **thread_safe**: Disabled by default, enabling this feature allows the library to be used in
-//!  multi-threaded environments safely.
+//! - **single-threaded**: Disabled by default, enable this feature if you are working in a single-threaded environment
+//!   or if you want to manage synchronization yourself.
 //!
 //! ## Usage
 //!
@@ -24,24 +24,23 @@
 //!
 //! ```toml
 //! [dependencies]
-//! hash_cons = "0.1.4"  # Replace with the actual version
+//! hash_cons = "0.2.0"  # Replace with the actual version
 //! ```
 //!
-//! By default, the library operates in a single-threaded environment with auto_cleanup enabled. For multi-threaded support, enable the `thread-safe` feature:
+//! By default, the library operates in a multi-threaded environment with auto_cleanup enabled. For single-threaded support, enable the `single-threaded` feature:
 //!
 //! ```toml
-//! # Default single-threaded with auto_cleanup enabled
-//! hash_cons = "0.1.4"
+//! # Default multi-threaded with auto_cleanup enabled
+//! hash_cons = "0.2.0"
 //!
-//! # For multi-threaded environments with auto_cleanup enabled
-//! hash_cons = { version = "0.1.4", features = ["thread-safe"] }
-//!
-//! # For single-threaded environments with auto_cleanup disabled
-//! hash_cons = { version = "0.1.4", default-features = false }
+//! # For single-threaded environments with auto_cleanup enabled
+//! hash_cons = { version = "0.2.0", features = ["single-threaded"] }
 //!
 //! # For multi-threaded environments with auto_cleanup disabled
-//! hash_cons = { version = "0.1.4", default-features = false, features = ["thread-safe"] }
+//! hash_cons = { version = "0.2.0", default-features = false }
 //!
+//! # For single-threaded environments with auto_cleanup disabled
+//! hash_cons = { version = "0.2.0", default-features = false, features = ["single-threaded"] }
 //! ```
 //!
 //! ## Examples
@@ -59,39 +58,11 @@
 //! }
 //!
 //!
-//! /// Single-threaded usage with auto_cleanup enabled by default
+//! /// Multi-threaded usage with auto_cleanup enabled by default
 //!
-//! #[cfg(all(feature = "auto-cleanup", not(feature = "thread-safe")))]
+//! #[cfg(all(feature = "auto-cleanup", not(feature = "single-threaded")))]
 //! fn main() {
-//!     let table: HcTable<BoolExpr> = HcTable::new();
-//!     let const_true = BoolExpr::Const(true);
-//!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
-//!     drop(hc_true);// hc_true is automatically removed from the table when dropped from the memory
-//!     assert_eq!(table.len(), 0);
-//! }
-//!
-//!
-//! ///single-threaded usage with auto_cleanup disabled
-//!
-//! #[cfg(all(not(feature = "thread-safe"), not(feature = "auto-cleanup")))]
-//! fn main() {
-//!     let table: HcTable<BoolExpr> = HcTable::new();
-//!     let const_true = BoolExpr::Const(true);
-//!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
-//!     drop(hc_true);
-//!     assert_eq!(table.len(), 1);
-//!     table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
-//!     assert_eq!(table.len(), 0);
-//! }
-//!
-//!
-//! /// Thread-safe usage with auto_cleanup enabled
-//!
-//! use std::thread;
-//!
-//!
-//! #[cfg(all(feature = "thread-safe", feature = "auto-cleanup"))]
-//! fn main() {
+//!     use std::thread;
 //!     let table: HcTable<BoolExpr> = HcTable::new();
 //!     let table_clone = table.clone();
 //!     let thread_handle_hc_false = thread::spawn(move || {
@@ -103,10 +74,11 @@
 //! }
 //!
 //!
-//! /// Thread-safe usage with auto_cleanup disabled
+//! /// Multi-threaded usage with auto_cleanup disabled
 //!
-//! #[cfg(all(feature = "thread-safe", not(feature = "auto-cleanup")))]
+//! #[cfg(all(not(feature = "auto-cleanup"), not(feature = "single-threaded")))]
 //! fn main() {
+//!     use std::thread;
 //!     let table: HcTable<BoolExpr> = HcTable::new();
 //!     let table_clone = table.clone();
 //!     let thread_handle_hc_true = thread::spawn(move || {
@@ -118,17 +90,43 @@
 //!     table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
 //!     assert_eq!(table.len(), 0);
 //! }
+//!
+//!
+//! /// Single-threaded usage with auto_cleanup enabled
+//!
+//! #[cfg(all(feature = "auto-cleanup", feature = "single-threaded"))]
+//! fn main() {
+//!     let table: HcTable<BoolExpr> = HcTable::new();
+//!     let const_true = BoolExpr::Const(true);
+//!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
+//!     drop(hc_true);// hc_true is automatically removed from the table when dropped from the memory
+//!     assert_eq!(table.len(), 0);
+//! }
+//!
+//!
+//! /// Single-threaded usage with auto_cleanup disabled
+//!
+//! #[cfg(all(feature = "single-threaded", not(feature = "auto-cleanup")))]
+//! fn main() {
+//!     let table: HcTable<BoolExpr> = HcTable::new();
+//!     let const_true = BoolExpr::Const(true);
+//!     let hc_true: Hc<BoolExpr> = table.hashcons(const_true);
+//!     drop(hc_true);
+//!     assert_eq!(table.len(), 1);
+//!     table.cleanup(); //hc_true is removed from the table after it has been dropped and `cleanup()` is called on the table.
+//!     assert_eq!(table.len(), 0);
+//! }
 //! ```
 //!
 
-#[cfg(not(feature = "thread-safe"))]
+#[cfg(feature = "single-threaded")]
 pub mod single_threaded;
 
-#[cfg(not(feature = "thread-safe"))]
+#[cfg(feature = "single-threaded")]
 pub use single_threaded::*;
 
-#[cfg(feature = "thread-safe")]
+#[cfg(not(feature = "single-threaded"))]
 pub mod thread_safe;
 
-#[cfg(feature = "thread-safe")]
+#[cfg(not(feature = "single-threaded"))]
 pub use thread_safe::*;
