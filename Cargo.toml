@@ -2,7 +2,7 @@
 name = "hash_cons"
 authors = ["Karan Ahluwalia <karan9123@gmail.com>"]
 version = "0.2.0"
-edition = "2024"
+edition = "2021"
 description = "A type-safe hash-cons library."
 readme = "README.md"
 license = "MIT"
